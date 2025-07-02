@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      /* CSS in counter-no-shadow affects everything in the page. */
+      /* CSS in counter-shadow-open and counter-shadow-closed does not. */
+      button {
+        background-color: blue;
+        color: black;
+      }
+
+      /* This only works for web components that use a shadow DOM. */
+      counter-shadow-open::part(count),
+      counter-shadow-closed::part(count) {
+        color: blue;
+      }
+
+      zit-demo {
+        color: green; /* can inherit inside web component */
+      }
+
+      zit-demo {
+        --zit-demo-label-color: red;
+      }
+    </style>
+
+    <script src="counter-no-shadow.js" type="module"></script>
+    <script src="counter-shadow-open.js" type="module"></script>
+    <script src="counter-shadow-closed.js" type="module"></script>
+    <script src="counter-vanilla.js" type="module"></script>
+    <script src="counter-lit.js" type="module"></script>
+    <script src="counter-zit.js" type="module"></script>
+    <script src="zit-demo.js" type="module"></script>
+    <!--script-- src="dom-gen-demo.js" type="module"></~script-->
+    <script>
+      /*
+      window.onload = () => {
+        const cns = document.querySelector("counter-no-shadow");
+        cns.setAttribute("count", 5);
+
+        const cso = document.querySelector("counter-shadow-open");
+        cso.setAttribute("count", 5);
+
+        // This works even though the shadow DOM is in closed mode.
+        const csc = document.querySelector("counter-shadow-closed");
+        csc.setAttribute("count", 5);
+
+        const cl = document.querySelector("counter-lit");
+        cl.setAttribute("count", 5);
+      };
+      */
+
+      function reportCount() {
+        /*
+        let counter = document.querySelector("counter-no-shadow");
+        counter.count = 19;
+        console.log("no shadow: counter.count =", counter.count);
+
+        // We can access this span element directly.
+        let span = counter.querySelector("span");
+        span.textContent = 20; // works
+        */
+        //---
+        /*
+        counter = document.querySelector("counter-shadow-open");
+        counter.count = 19;
+        console.log("shadow open: counter.count =", counter.count);
+
+        // We can access this span element using the shadow root.
+        span = counter.querySelector("span");
+        console.log("shadow open: span =", span); // null
+        span = counter.shadowRoot.querySelector("span"); // not null
+        span.textContent = 20; // works
+        */
+        //---
+        /*
+        counter = document.querySelector("counter-shadow-closed");
+        counter.count = 19;
+        console.log("shadow closed: counter.count =", counter.count);
+
+        span = counter.querySelector("span");
+        console.log("shadow closed: span =", span); // null
+        console.log("shadow closed: shadowRoot =", counter.shadowRoot); // null
+        // We cannot access the span element in this web component.
+        */
+        //---
+        /*
+        counter = document.querySelector("counter-lit");
+        counter.count = 19;
+        console.log("lit: counter.count =", counter.count);
+
+        // Lit web components use a shadow DOM by default,
+        // that can be avoided by implementing the following method:
+        // createRenderRoot() { return this; }
+        span = counter.querySelector("span");
+        console.log("lit: span =", span); // null
+        span = counter.shadowRoot.querySelector("span");
+        span.textContent = 20; // works but get
+        // "TypeError: Cannot set properties of null (setting 'data')"; Why?
+        console.log("lit: counter.count =", counter.count);
+        */
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Counters</h1>
+
+    <!-- Rending this element causes its CSS to affect the entire page. -->
+    <!--
+    <h2>No Shadow</h2>
+    <counter-no-shadow count="3"></counter-no-shadow>
+
+    <h2>Shadow Open</h2>
+    <counter-shadow-open count="3"></counter-shadow-open>
+
+    <h2>Shadow Closed</h2>
+    <counter-shadow-closed count="3"></counter-shadow-closed>
+
+    <h2>Lit</h2>
+    <counter-lit count="3"></counter-lit>
+    -->
+
+    <h2>Vanilla</h2>
+    <counter-vanilla count="3"></counter-vanilla>
+
+    <h2>Zit</h2>
+    <counter-zit count="3"></counter-zit>
+
+    <!--
+    <zit-demo count="3" factor="2"></zit-demo>
+
+    <h2>Outside Web Components</h2>
+    <p>Note whether styles in the web components affect this.</p>
+    <button onclick="reportCount()" type="button">Click Me</button>
+
+    <h2>DOM Gen</h2>
+    <dom-gen-demo count="3" factor="2"></dom-gen-demo>
+    -->
+  </body>
+</html>
