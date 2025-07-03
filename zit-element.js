@@ -9,7 +9,6 @@ class ZitElement extends HTMLElement {
   static #REFERENCE_RE = new RegExp("this." + this.#IDENTIFIER);
 
   static #propertyToExpressionsMap = new Map();
-  static #subclassesProcessed = new Set();
   static #template = document.createElement("template");
 
   static get observedAttributes() {
@@ -60,7 +59,7 @@ class ZitElement extends HTMLElement {
     this.#defineProperties();
     this.#buildDOM();
     if (this.#reactive) this.#makeReactive();
-    ZitElement.#subclassesProcessed.add(this.constructor.name);
+    this.constructor.processed = true;
   }
 
   #defineProperties() {
@@ -212,10 +211,7 @@ class ZitElement extends HTMLElement {
 
     // Only map properties to expressions once for each web component because
     // the mapping will be the same for every instance of the web component.
-    const subclassName = this.constructor.name;
-    console.log("#registerPlaceholders: subclassName =", subclassName);
-    const processed = ZitElement.#subclassesProcessed.has(subclassName);
-    console.log("#registerPlaceholders: processed =", processed);
+    const processed = this.constructor.processed;
     if (!processed) {
       const skip = "this.".length;
       matches.forEach((capture) => {
