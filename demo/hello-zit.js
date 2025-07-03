@@ -2,7 +2,7 @@ import ZitElement from "../zit-element.js";
 
 class HelloZit extends ZitElement {
   static properties = {
-    name2: { type: String, reflect: true },
+    name: { type: String, reflect: true },
   };
 
   constructor() {
@@ -23,7 +23,7 @@ class HelloZit extends ZitElement {
 
   html() {
     return /*html*/ `
-      <p>"Hello, " + this.name2 + "!"</p>
+      <p>"Hello, " + this.name + "!"</p>
     `;
   }
 }
