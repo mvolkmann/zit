@@ -131,7 +131,6 @@ class ZitElement extends HTMLElement {
       this.#evaluateAttributes(element);
     }
 
-    /*
     console.log(
       "#propertyToExpressionsMap =",
       ZitElement.#propertyToExpressionsMap
