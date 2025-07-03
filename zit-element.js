@@ -6,8 +6,7 @@ class ZitElement extends HTMLElement {
   static #IDENTIFIER = `[${this.#FIRST_CHAR}][${this.#OTHER_CHAR}]*(?![${
     this.#OTHER_CHAR
   }\\(])`;
-  static #PLACEHOLDER_RE = /@\{(.+)\}/;
-  static #REFERENCE_RE = new RegExp(`(this\\.${this.#IDENTIFIER})`);
+  static #REFERENCE_RE = new RegExp("this." + this.#IDENTIFIER);
 
   static #attributeTypeMap = new Map();
   static #propertyToExpressionsMap = new Map();
@@ -131,6 +130,14 @@ class ZitElement extends HTMLElement {
 
       this.#evaluateAttributes(element);
     }
+
+    /*
+    console.log(
+      "#propertyToExpressionsMap =",
+      ZitElement.#propertyToExpressionsMap
+    );
+    console.log("#expressionReferencesMap =", this.#expressionReferencesMap);
+    */
   }
 
   static register() {
@@ -176,54 +183,36 @@ class ZitElement extends HTMLElement {
     }
   }
 
+  // Do not place untrusted expressions in
+  // attribute values or the text content of elements!
   #registerPlaceholders(text, element, attrName) {
-    let matches = text.match(ZitElement.#PLACEHOLDER_RE);
-    if (matches) {
-      // Do not place untrusted expressions in
-      // attribute values or the text content of elements!
-      const expression = matches[1].trim();
-      let references = this.#expressionReferencesMap.get(expression);
-      if (!references) {
-        references = [];
-        this.#expressionReferencesMap.set(expression, references);
-      }
-      references.push(attrName ? { element, attrName } : element);
+    const matches = text.match(ZitElement.#REFERENCE_RE);
+    if (!matches) return;
 
-      const value = ZitElement.#evaluateInContext(expression, this);
-      if (attrName) {
-        this.#updateAttribute(element, attrName, value);
-      } else {
-        element.textContent = value;
-      }
+    let references = this.#expressionReferencesMap.get(text);
+    if (!references) {
+      references = [];
+      this.#expressionReferencesMap.set(text, references);
+    }
+    references.push(attrName ? { element, attrName } : element);
 
-      matches = expression.match(ZitElement.#REFERENCE_RE);
-      const skip = "this.".length;
-      matches.forEach((capture, index) => {
-        if (index > 0) {
-          const propertyName = capture.substring(skip);
-          let expressions =
-            ZitElement.#propertyToExpressionsMap.get(propertyName);
-          if (!expressions) {
-            expressions = [];
-            ZitElement.#propertyToExpressionsMap.set(propertyName, expressions);
-          }
-          expressions.push(expression);
-        }
-      });
+    const value = ZitElement.#evaluateInContext(text, this);
+    if (attrName) {
+      this.#updateAttribute(element, attrName, value);
+    } else {
+      element.textContent = value;
     }
 
-    /*
-    console.log(
-      "#react: #propertyToExpressionsMap =",
-      ZitElement.#propertyToExpressionsMap
-    );
-    console.log(
-      "#react: #expressionReferencesMap =",
-      this.#expressionReferencesMap
-    );
-    */
-
-    return Boolean(matches);
+    const skip = "this.".length;
+    matches.forEach((capture) => {
+      const propertyName = capture.substring(skip);
+      let expressions = ZitElement.#propertyToExpressionsMap.get(propertyName);
+      if (!expressions) {
+        expressions = [];
+        ZitElement.#propertyToExpressionsMap.set(propertyName, expressions);
+      }
+      expressions.push(text);
+    });
   }
 
   #render() {
