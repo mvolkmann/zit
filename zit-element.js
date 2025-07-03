@@ -9,6 +9,7 @@ class ZitElement extends HTMLElement {
   static #REFERENCE_RE = new RegExp("this." + this.#IDENTIFIER);
 
   static #attributeTypeMap = new Map();
+  static #firstInstance = true;
   static #propertyToExpressionsMap = new Map();
   static #template = document.createElement("template");
 
@@ -40,6 +41,7 @@ class ZitElement extends HTMLElement {
     this.#defineProperties();
     this.#render();
     if (this.#reactive) this.#makeReactive();
+    ZitElement.#firstInstance = false;
   }
 
   #defineProperties() {
@@ -131,6 +133,7 @@ class ZitElement extends HTMLElement {
       this.#evaluateAttributes(element);
     }
 
+    /*
     console.log(
       "#propertyToExpressionsMap =",
       ZitElement.#propertyToExpressionsMap
@@ -188,6 +191,22 @@ class ZitElement extends HTMLElement {
     const matches = text.match(ZitElement.#REFERENCE_RE);
     if (!matches) return;
 
+    // Only map properties to expressions once for each web component because
+    // the mapping will be the same for every instance of the web component.
+    if (ZitElement.#firstInstance) {
+      const skip = "this.".length;
+      matches.forEach((capture) => {
+        const propertyName = capture.substring(skip);
+        let expressions =
+          ZitElement.#propertyToExpressionsMap.get(propertyName);
+        if (!expressions) {
+          expressions = [];
+          ZitElement.#propertyToExpressionsMap.set(propertyName, expressions);
+        }
+        expressions.push(text);
+      });
+    }
+
     let references = this.#expressionReferencesMap.get(text);
     if (!references) {
       references = [];
@@ -201,17 +220,6 @@ class ZitElement extends HTMLElement {
     } else {
       element.textContent = value;
     }
-
-    const skip = "this.".length;
-    matches.forEach((capture) => {
-      const propertyName = capture.substring(skip);
-      let expressions = ZitElement.#propertyToExpressionsMap.get(propertyName);
-      if (!expressions) {
-        expressions = [];
-        ZitElement.#propertyToExpressionsMap.set(propertyName, expressions);
-      }
-      expressions.push(text);
-    });
   }
 
   #render() {
