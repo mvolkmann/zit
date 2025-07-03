@@ -24,7 +24,6 @@ class ZitElement extends HTMLElement {
     this.attachShadow({ mode: "open" });
   }
 
-  //TODO: Why is this called immediately for CounterZit, but not for HelloZit?
   attributeChangedCallback(attrName, _, newValue) {
     // Update the corresponding property.
     this[attrName] = this.#getTypedValue(attrName, newValue);
