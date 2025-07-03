@@ -10,15 +10,7 @@ class HelloZitReactive extends ZitElement {
   }
 
   css() {
-    return /*css*/ `
-      :not(:defined) {
-        visibility: hidden;
-      }
-
-      p {
-        color: purple;
-      }
-    `;
+    return /*css*/ `p { color: purple; }`;
   }
 
   html() {

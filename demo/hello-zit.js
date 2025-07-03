@@ -6,15 +6,7 @@ class HelloZit extends ZitElement {
   };
 
   css() {
-    return /*css*/ `
-      :not(:defined) {
-        visibility: hidden;
-      }
-
-      p {
-        color: blue;
-      }
-    `;
+    return /*css*/ `p { color: blue; }`;
   }
 
   html() {
