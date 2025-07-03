@@ -30,15 +30,15 @@ class ZitElement extends HTMLElement {
   }
 
   #buildDOM() {
-    const definesCss = Boolean(this.constructor.prototype.css);
-    let template = `
-      ${definesCss ? `<style>${this.css()}</style>` : ""}
-      ${this.html()}
-      `;
+    let template = this.constructor.prototype.css
+      ? `<style>${this.css()}</style>`
+      : "";
+    template += this.html();
 
     if (!this.#reactive) {
       template = Function(`return \`${template}\`;`).call(this);
     }
+
     ZitElement.#template.innerHTML = template;
 
     this.shadowRoot.replaceChildren(
