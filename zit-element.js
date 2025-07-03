@@ -1,11 +1,7 @@
 class ZitElement extends HTMLElement {
-  // This uses a negative lookahead to match an identifier
-  // that is not immediately followed by a left parenthesis.
   static #FIRST_CHAR = "a-zA-Z_$";
   static #OTHER_CHAR = this.#FIRST_CHAR + "0-9";
-  static #IDENTIFIER = `[${this.#FIRST_CHAR}][${this.#OTHER_CHAR}]*(?![${
-    this.#OTHER_CHAR
-  }\\(])`;
+  static #IDENTIFIER = `[${this.#FIRST_CHAR}][${this.#OTHER_CHAR}]*`;
   static #REFERENCE_RE = new RegExp("this." + this.#IDENTIFIER);
 
   static #propertyToExpressionsMap = new Map();

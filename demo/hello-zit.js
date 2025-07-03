@@ -19,7 +19,7 @@ class HelloZit extends ZitElement {
 
   html() {
     return /*html*/ `
-      <p>Hello, ${this.name}. Shouting ${this.name.toUpperCase()}!</p>
+      <p>Hello, ${this.name}. Shouting ${this.name?.toUpperCase()}!</p>
     `;
   }
 }
