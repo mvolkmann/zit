@@ -1,5 +1,4 @@
-import ZitElement from "./zit-element.js";
-//import ZitElement from "./zit-element.min.js";
+import ZitElement from "../zit-element.js";
 
 class CounterZit extends ZitElement {
   static properties = {
@@ -43,7 +42,7 @@ class CounterZit extends ZitElement {
       <button disabled="@{this.count === 0}" onclick="decrement">-</button>
       <span>@{this.count}</span>
       <button onclick="increment">+</button>
-      <span>@{this.count >= 10 ? "double-digit" : "safe"}</span>
+      <span>@{this.count < 10 ? "single" : "double"} digit</span>
     </div>
     `;
   }
