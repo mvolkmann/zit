@@ -2,7 +2,7 @@ class ZitElement extends HTMLElement {
   static #FIRST_CHAR = "a-zA-Z_$";
   static #OTHER_CHAR = this.#FIRST_CHAR + "0-9";
   static #IDENTIFIER = `[${this.#FIRST_CHAR}][${this.#OTHER_CHAR}]*`;
-  static #REFERENCE_RE = new RegExp("this." + this.#IDENTIFIER);
+  static #REFERENCE_RE = new RegExp("this." + this.#IDENTIFIER, "g");
 
   static #propertyToExpressionsMap = new Map();
   static #template = document.createElement("template");
@@ -164,6 +164,7 @@ class ZitElement extends HTMLElement {
       this.#evaluateAttributes(element);
     }
 
+    /*
     console.log(
       "#propertyToExpressionsMap =",
       ZitElement.#propertyToExpressionsMap

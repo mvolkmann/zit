@@ -15,7 +15,10 @@ class HelloZitReactive extends ZitElement {
 
   html() {
     return /*html*/ `
-      <p>"Hello, " + this.name + ". Shouting " + this.name.toUpperCase() + "!"</p>
+      <p>
+        Hello, <span>this.name</span>.
+        Shouting <span>this.name.toUpperCase()</span>!
+      </p>
     `;
   }
 }
