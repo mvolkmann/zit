@@ -1,9 +1,13 @@
 import ZitElement from "../zit-element.js";
 
-class HelloZit extends ZitElement {
+class HelloZitReactive extends ZitElement {
   static properties = {
     name: { type: String, reflect: true },
   };
+
+  constructor() {
+    super(true);
+  }
 
   css() {
     return /*css*/ `
@@ -12,16 +16,16 @@ class HelloZit extends ZitElement {
       }
 
       p {
-        color: blue;
+        color: purple;
       }
     `;
   }
 
   html() {
     return /*html*/ `
-      <p>Hello, ${this.name}. Shouting ${this.name.toUpperCase()}!</p>
+      <p>"Hello, " + this.name + ". Shouting " + this.name.toUpperCase() + "!"</p>
     `;
   }
 }
 
-HelloZit.register();
+HelloZitReactive.register();
