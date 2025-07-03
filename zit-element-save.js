@@ -8,15 +8,11 @@ class ZitElement extends HTMLElement {
   }\\(])`;
   static #REFERENCE_RE = new RegExp("this." + this.#IDENTIFIER);
 
-  static #propertyToExpressionsMap = new Map();
+  static #subclassToDataMap = new Map();
   static #subclassesProcessed = new Set();
+
   static #template = document.createElement("template");
 
-  static get observedAttributes() {
-    return Object.keys(this.properties || {});
-  }
-
-  #expressionReferencesMap = new Map();
   #reactive = false;
 
   constructor(reactive) {
@@ -25,20 +21,19 @@ class ZitElement extends HTMLElement {
     this.attachShadow({ mode: "open" });
   }
 
-  //TODO: Why is this called immediately for CounterZit, but not for HelloZit?
   attributeChangedCallback(attrName, _, newValue) {
     // Update the corresponding property.
     this[attrName] = this.#getTypedValue(attrName, newValue);
   }
 
   #buildDOM() {
-    const definesCss = Boolean(this.constructor.prototype.css);
     let template = `
-      ${definesCss ? `<style>${this.css()}</style>` : ""}
+      <style>${this.css()}</style>
       ${this.html()}
       `;
 
     if (!this.#reactive) {
+      template = template.replaceAll("@{", "${");
       template = Function(`return \`${template}\`;`).call(this);
     }
     ZitElement.#template.innerHTML = template;
@@ -57,28 +52,46 @@ class ZitElement extends HTMLElement {
   }
 
   connectedCallback() {
+    console.log(
+      "zit-element.js connectedCallback: this.constructor.name =",
+      this.constructor.name
+    );
     this.#defineProperties();
+
+    if (this.#reactive) {
+      if (!ZitElement.#getSubclassData()) {
+        ZitElement.#subclassToDataMap.set(subclassName, {
+          attributeTypeMap: new Map(),
+          expressionToReferencesMap: new Map(),
+          propertyToReferencesMap: new Map(),
+        });
+      }
+
+      this.#makeReactive();
+    }
+
+    ZitElement.#subclassesProcessed.add(subclassName);
+
     this.#buildDOM();
-    if (this.#reactive) this.#makeReactive();
-    ZitElement.#subclassesProcessed.add(this.constructor.name);
   }
 
   #defineProperties() {
     const properties = this.constructor.properties;
-    const { observedAttributes } = this.constructor;
     for (const [name, options] of Object.entries(properties)) {
-      this.#defineProperty(name, options, observedAttributes);
+      this.#defineProperty(name, options);
     }
   }
 
-  #defineProperty(propertyName, options, observedAttributes) {
+  #defineProperty(propertyName, options) {
+    // Bail out if propertyName is missing in the properties of the subclass.
+    const keys = Object.keys(this.constructor.properties);
+    if (!keys.includes(propertyName)) return;
+
     // Copy the property value to a new property with a leading underscore.
     // The property is replaced below with Object.defineProperty.
-    const value =
-      observedAttributes.includes(propertyName) &&
-      this.hasAttribute(propertyName)
-        ? this.#getTypedAttribute(propertyName)
-        : options.value;
+    const value = this.hasAttribute(propertyName)
+      ? this.#getTypedAttribute(propertyName)
+      : options.value;
     this["_" + propertyName] = value;
 
     Object.defineProperty(this, propertyName, {
@@ -150,12 +163,22 @@ class ZitElement extends HTMLElement {
     }
   }
 
+  static #getSubclassData() {
+    const subclassName = this.name;
+    console.log(
+      "zit-element.js #getSubclassData: subclassName =",
+      subclassName
+    );
+    return ZitElement.#subclassToDataMap.get(subclassName);
+  }
+
   #getTypedAttribute(attrName) {
     return this.#getTypedValue(attrName, this.getAttribute(attrName));
   }
 
   #getTypedValue(attrName, stringValue) {
-    const type = this.constructor.properties[attrName].type;
+    const { attributeTypeMap } = ZitElement.#getSubclassData();
+    const type = attributeTypeMap.get(attrName);
     if (type === Number) return Number(stringValue);
     if (type === Boolean) return Boolean(stringValue);
     return stringValue;
@@ -175,17 +198,18 @@ class ZitElement extends HTMLElement {
       "#propertyToExpressionsMap =",
       ZitElement.#propertyToExpressionsMap
     );
-    console.log("#expressionReferencesMap =", this.#expressionReferencesMap);
+    console.log("#expressionToReferencesMap =", this.#expressionToReferencesMap);
     */
   }
 
+  // Updates all expression references.
   #react(propertyName) {
-    // Update all expression references.
-    const expressions =
-      ZitElement.#propertyToExpressionsMap.get(propertyName) || [];
+    const { expressionToReferencesMap, propertyToExpressionsMap } =
+      ZitElement.#getSubclassData();
+    const expressions = propertyToExpressionsMap.get(propertyName) || [];
     for (const expression of expressions) {
       const value = ZitElement.#evaluateInContext(expression, this);
-      const references = this.#expressionReferencesMap.get(expression);
+      const references = expressionToReferencesMap.get(expression);
       for (const reference of references) {
         if (reference instanceof Element) {
           reference.textContent = value;
@@ -210,30 +234,30 @@ class ZitElement extends HTMLElement {
     const matches = text.match(ZitElement.#REFERENCE_RE);
     if (!matches) return;
 
+    const {
+      alreadyProcessed,
+      expressionToReferencesMap,
+      propertyToExpressionsMap,
+    } = ZitElement.#getSubclassData();
     // Only map properties to expressions once for each web component because
     // the mapping will be the same for every instance of the web component.
-    const subclassName = this.constructor.name;
-    console.log("#registerPlaceholders: subclassName =", subclassName);
-    const processed = ZitElement.#subclassesProcessed.has(subclassName);
-    console.log("#registerPlaceholders: processed =", processed);
-    if (!processed) {
+    if (!alreadyProcessed) {
       const skip = "this.".length;
       matches.forEach((capture) => {
         const propertyName = capture.substring(skip);
-        let expressions =
-          ZitElement.#propertyToExpressionsMap.get(propertyName);
+        let expressions = propertyToExpressionsMap.get(propertyName);
         if (!expressions) {
           expressions = [];
-          ZitElement.#propertyToExpressionsMap.set(propertyName, expressions);
+          propertyToExpressionsMap.set(propertyName, expressions);
         }
         expressions.push(text);
       });
     }
 
-    let references = this.#expressionReferencesMap.get(text);
+    let references = expressionToReferencesMap.get(text);
     if (!references) {
       references = [];
-      this.#expressionReferencesMap.set(text, references);
+      expressionToReferencesMap.set(text, references);
     }
     references.push(attrName ? { element, attrName } : element);
 

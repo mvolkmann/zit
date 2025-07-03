@@ -40,7 +40,8 @@ can be replaced by `onClick="increment"`.
 The implement reactivity, Zit looks for "this."
 followed by a valid JavaScript identifier in
 the text content of elements and in attribute values.
-It uses those matches to populate to maps.
-The first maps property names to expressions (`propertyToExpressionsMap`).
-The second maps expressions to element or attribute references
-(`expressionToReferencesMap`).
+It uses those matches to populate two `Map`s.
+The first `Map` maps property names to expressions (`#propertyToExpressionsMap`).
+This `Map` is static because every instance of the
+The second `Map` maps expressions to element or attribute references
+(`#expressionToReferencesMap`).
