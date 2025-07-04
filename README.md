@@ -58,3 +58,16 @@ that refer to modified web component properties are updated.
 Attribute values and text content that contain references to properties
 must be valid JavaScript expressions that are NOT surrounded by `${...}`.
 For an example of this kind of web component, see `demo/hello-zit-reactive.js`.
+
+Zit supports two-way data binding for HTML form elements.
+
+- `input` and `select` elements can have a `value` attribute
+  whose value is "@" followed by a property name.
+- `textarea` elements can have text content
+  that is "@" followed by a property name.
+
+In all these cases, if the user changes the value of the form element,
+the specified property is updated.
+When the property is updated,
+the displayed value of the form element is updated.
+For examples, see `demo/data-bind.js`.
