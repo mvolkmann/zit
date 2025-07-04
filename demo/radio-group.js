@@ -16,19 +16,19 @@ class RadioGroup extends ZitElement {
   connectedCallback() {
     super.connectedCallback();
     this.#optionsArray = this.options.split(",").map((option) => option.trim());
-    console.log("connectedCallback: this.#optionsArray =", this.#optionsArray);
     if (!this.default) this.default = this.#optionsArray[0];
-    console.log("connectedCallback: this.default =", this.default);
     if (!this.value) this.value = this.default;
     this.#value = this.value;
-    console.log("connectedCallback: this.value =", this.value);
     super.buildDOM();
 
     // Add event listeners to the radio buttons.
+    //TODO: Maybe adding two-way data binding would remove the need for this code.
     const inputs = this.shadowRoot.querySelectorAll("input");
     for (const input of inputs) {
       input.addEventListener("change", (event) => {
         this.value = event.target.value;
+        this.#internals.setFormValue(this.value);
+        this.dispatchEvent(new Event("change"));
       });
     }
   }
@@ -75,21 +75,6 @@ class RadioGroup extends ZitElement {
         <label for="${option}">${option}</label>
       </div>
     `;
-  }
-
-  get value() {
-    return this.#value;
-  }
-
-  set value(newValue) {
-    console.log("radio-group.js set value: newValue =", newValue);
-    if (newValue === this.#value) return;
-
-    this.#value = newValue;
-    this.#internals.setFormValue(newValue);
-    const input = this.shadowRoot.getElementById(newValue);
-    if (input) input.checked = true;
-    this.dispatchEvent(new Event("change"));
   }
 }
 
