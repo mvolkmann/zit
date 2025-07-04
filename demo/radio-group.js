@@ -13,12 +13,7 @@ class RadioGroup extends ZitElement {
     value: { type: String },
   };
 
-  connectedCallback() {
-    super.connectedCallback();
-    this.#optionsArray = this.options.split(",").map((option) => option.trim());
-    if (!this.default) this.default = this.#optionsArray[0];
-    if (!this.value) this.value = this.default;
-    this.#value = this.value;
+  buildDOM() {
     super.buildDOM();
 
     // Add event listeners to the radio buttons.
@@ -26,11 +21,23 @@ class RadioGroup extends ZitElement {
     const inputs = this.shadowRoot.querySelectorAll("input");
     for (const input of inputs) {
       input.addEventListener("change", (event) => {
-        this.value = event.target.value;
-        this.#internals.setFormValue(this.value);
+        const { value } = event.target;
+        this.value = value;
+        this.#internals.setFormValue(value);
         this.dispatchEvent(new Event("change"));
       });
     }
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+
+    this.#optionsArray = this.options.split(",").map((option) => option.trim());
+    if (!this.default) this.default = this.#optionsArray[0];
+    if (!this.value) this.value = this.default;
+    this.#value = this.value;
+
+    this.buildDOM();
   }
 
   css() {
