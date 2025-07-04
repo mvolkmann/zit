@@ -2,44 +2,27 @@ import ZitElement from "../zit-element.js";
 
 class RadioGroup extends ZitElement {
   static formAssociated = true;
-  #default;
-  #internals;
-  #name;
+  #internals = this.attachInternals();
+  #optionsArray = [];
   #value;
 
-  constructor() {
-    super();
-    this.#internals = this.attachInternals();
-  }
+  static properties = {
+    default: { type: String },
+    name: { type: String },
+    options: { type: String },
+    value: { type: String },
+  };
 
   connectedCallback() {
-    this.#name = this.getAttribute("name");
-    const options = this.getAttribute("options")
-      .split(",")
-      .map((option) => option.trim());
-    this.#default = this.getAttribute("default") || options[0];
-    this.#value = this.getAttribute("value") || this.#default;
-
-    this.shadowRoot.innerHTML = /*html*/ `
-      <style>
-        :not(:defined) {
-          visibility: hidden;
-        }
-
-        .radio-group {
-          display: flex;
-          gap: 0.25rem;
-
-          > div {
-            display: flex;
-            align-items: center;
-          } 
-        }
-      </style>
-      <div class="radio-group">
-        ${options.map((option) => this.#makeRadio(option)).join("")}
-      </div>
-    `;
+    super.connectedCallback();
+    this.#optionsArray = this.options.split(",").map((option) => option.trim());
+    console.log("connectedCallback: this.#optionsArray =", this.#optionsArray);
+    if (!this.default) this.default = this.#optionsArray[0];
+    console.log("connectedCallback: this.default =", this.default);
+    if (!this.value) this.value = this.default;
+    this.#value = this.value;
+    console.log("connectedCallback: this.value =", this.value);
+    super.buildDOM();
 
     // Add event listeners to the radio buttons.
     const inputs = this.shadowRoot.querySelectorAll("input");
@@ -50,8 +33,30 @@ class RadioGroup extends ZitElement {
     }
   }
 
+  css() {
+    return /*css*/ `
+      .radio-group {
+        display: flex;
+        gap: 0.25rem;
+
+        > div {
+          display: flex;
+          align-items: center;
+        } 
+      }
+    `;
+  }
+
+  html() {
+    return /*html*/ `
+      <div class="radio-group">
+        ${this.#optionsArray.map((option) => this.#makeRadio(option)).join("")}
+      </div>
+    `;
+  }
+
   formResetCallback() {
-    const value = (this.value = this.#default);
+    const value = (this.value = this.default);
     for (const input of this.shadowRoot.querySelectorAll("input")) {
       input.checked = input.value === value;
     }
@@ -63,7 +68,7 @@ class RadioGroup extends ZitElement {
         <input
           type="radio"
           id="${option}"
-          name="${this.#name}"
+          name="${this.name}"
           value="${option}"
           ${option === this.value ? "checked" : ""}
         />
@@ -77,6 +82,7 @@ class RadioGroup extends ZitElement {
   }
 
   set value(newValue) {
+    console.log("radio-group.js set value: newValue =", newValue);
     if (newValue === this.#value) return;
 
     this.#value = newValue;

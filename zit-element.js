@@ -25,7 +25,8 @@ class ZitElement extends HTMLElement {
     this[attrName] = this.#getTypedValue(attrName, newValue);
   }
 
-  #buildDOM() {
+  // This is not private so it can be called from subclasses.
+  buildDOM() {
     let template = this.constructor.prototype.css
       ? `<style>${this.css()}</style>`
       : "";
@@ -52,7 +53,7 @@ class ZitElement extends HTMLElement {
 
   connectedCallback() {
     this.#defineProperties();
-    this.#buildDOM();
+    this.buildDOM();
     if (this.#reactive) this.#makeReactive();
     this.constructor.processed = true;
   }
@@ -98,7 +99,7 @@ class ZitElement extends HTMLElement {
         if (this.#reactive) {
           this.#react(propertyName);
         } else {
-          this.#buildDOM();
+          this.buildDOM();
         }
       },
     });

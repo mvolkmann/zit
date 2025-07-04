@@ -11,7 +11,6 @@ class CounterZit extends ZitElement {
   // where property changes trigger targeted text and attribute updates.
   constructor() {
     super(true);
-    //super();
   }
 
   css() {
