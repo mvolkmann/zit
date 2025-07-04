@@ -4,7 +4,6 @@ class RadioGroup extends ZitElement {
   static formAssociated = true;
   #internals = this.attachInternals();
   #optionsArray = [];
-  #value;
 
   static properties = {
     default: { type: String },
@@ -15,6 +14,8 @@ class RadioGroup extends ZitElement {
 
   buildDOM() {
     super.buildDOM();
+
+    this.#internals.setFormValue(this.value);
 
     // Add event listeners to the radio buttons.
     //TODO: Maybe adding two-way data binding would remove the need for this code.
@@ -35,7 +36,6 @@ class RadioGroup extends ZitElement {
     this.#optionsArray = this.options.split(",").map((option) => option.trim());
     if (!this.default) this.default = this.#optionsArray[0];
     if (!this.value) this.value = this.default;
-    this.#value = this.value;
 
     this.buildDOM();
   }
@@ -63,7 +63,8 @@ class RadioGroup extends ZitElement {
   }
 
   formResetCallback() {
-    const value = (this.value = this.default);
+    this.value = this.default;
+    const { value } = this;
     for (const input of this.shadowRoot.querySelectorAll("input")) {
       input.checked = input.value === value;
     }
