@@ -107,29 +107,22 @@ class ZitElement extends HTMLElement {
   }
 
   #evaluateAttributes(element) {
+    const { localName } = element;
     for (const attrName of element.getAttributeNames()) {
-      if (!this.#canDataBind(element, attrName)) {
-        const text = element.getAttribute(attrName);
+      const text = element.getAttribute(attrName);
+      if (
+        (localName === "input" || localName === "select") &&
+        attrName === "value" &&
+        text.startsWith("@")
+      ) {
+        const propertyName = text.substring(1);
+        const propertyValue = this[propertyName];
+        element.setAttribute(attrName, propertyValue);
+        element[attrName] = propertyValue;
+        this.#bind(element, propertyName);
+      } else {
         this.#registerPlaceholders(text, element, attrName);
       }
-    }
-  }
-
-  #canDataBind(element, attrName) {
-    const { localName } = element;
-    if (localName === "input" || localName === "select") {
-      if (attrName !== "value") return false;
-
-      const text = element.getAttribute(attrName);
-      if (!text.startsWith("@")) return false;
-
-      const propertyName = text.substring(1);
-      const propertyValue = this[propertyName];
-      element.setAttribute(attrName, propertyValue);
-      element[attrName] = propertyValue;
-      this.#bind(element, propertyName);
-    } else {
-      return false;
     }
   }
 
