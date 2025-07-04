@@ -14,20 +14,7 @@ class RadioGroup extends ZitElement {
 
   buildDOM() {
     super.buildDOM();
-
     this.#internals.setFormValue(this.value);
-
-    // Add event listeners to the radio buttons.
-    //TODO: Maybe adding two-way data binding would remove the need for this code.
-    const inputs = this.shadowRoot.querySelectorAll("input");
-    for (const input of inputs) {
-      input.addEventListener("change", (event) => {
-        const { value } = event.target;
-        this.value = value;
-        this.#internals.setFormValue(value);
-        this.dispatchEvent(new Event("change"));
-      });
-    }
   }
 
   connectedCallback() {
@@ -70,6 +57,14 @@ class RadioGroup extends ZitElement {
     }
   }
 
+  //TODO: Maybe adding two-way data binding would remove the need for this method.
+  handleChange(event) {
+    const { value } = event.target;
+    this.value = value;
+    this.#internals.setFormValue(value);
+    this.dispatchEvent(new Event("change"));
+  }
+
   #makeRadio(option) {
     return /*html*/ `
       <div>
@@ -79,6 +74,7 @@ class RadioGroup extends ZitElement {
           name="${this.name}"
           value="${option}"
           ${option === this.value ? "checked" : ""}
+          onchange="handleChange"
         />
         <label for="${option}">${option}</label>
       </div>
