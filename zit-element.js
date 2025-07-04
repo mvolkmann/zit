@@ -12,6 +12,7 @@ class ZitElement extends HTMLElement {
   }
 
   #expressionReferencesMap = new Map();
+  #propertyToBindingsMap = new Map();
   #reactive = false;
 
   constructor(reactive) {
@@ -23,6 +24,24 @@ class ZitElement extends HTMLElement {
   attributeChangedCallback(attrName, _, newValue) {
     // Update the corresponding property.
     this[attrName] = this.#getTypedValue(attrName, newValue);
+  }
+
+  #bind(element, propertyName, attrName) {
+    element.addEventListener("input", (event) => {
+      const { value } = event.target;
+      this[propertyName] = value;
+      const options = this.constructor.properties[propertyName];
+      if (options.reflect && this.hasAttribute(propertyName)) {
+        this.setAttribute(propertyName, value);
+      }
+    });
+
+    let bindings = this.#propertyToBindingsMap.get(propertyName);
+    if (!bindings) {
+      bindings = [];
+      this.#propertyToBindingsMap.set(propertyName, bindings);
+    }
+    bindings.push(attrName ? { element, attrName } : element);
   }
 
   // This is not private so it can be called from subclasses.
@@ -115,11 +134,12 @@ class ZitElement extends HTMLElement {
         attrName === "value" &&
         text.startsWith("@")
       ) {
+        // Configure data binding.
         const propertyName = text.substring(1);
         const propertyValue = this[propertyName];
         element.setAttribute(attrName, propertyValue);
         element[attrName] = propertyValue;
-        this.#bind(element, propertyName);
+        this.#bind(element, propertyName, attrName);
       } else {
         this.#registerPlaceholders(text, element, attrName);
       }
@@ -140,27 +160,14 @@ class ZitElement extends HTMLElement {
     if (localName === "style") return;
 
     const text = element.textContent.trim();
-
-    if (localName === "textarea") {
-      if (!text.startsWith("@")) return false;
-
+    if (localName === "textarea" && text.startsWith("@")) {
+      // Configure data binding.
       const propertyName = text.substring(1);
       element.textContent = this[propertyName];
       this.#bind(element, propertyName);
     } else {
       this.#registerPlaceholders(text, element);
     }
-  }
-
-  #bind(element, propertyName) {
-    element.addEventListener("input", (event) => {
-      const { value } = event.target;
-      this[propertyName] = value;
-      const options = this.constructor.properties[propertyName];
-      if (options.reflect && this.hasAttribute(propertyName)) {
-        this.setAttribute(propertyName, value);
-      }
-    });
   }
 
   #fixBooleanAttributes(element) {
@@ -218,6 +225,19 @@ class ZitElement extends HTMLElement {
           const { element, attrName } = reference;
           this.#updateAttribute(element, attrName, value);
         }
+      }
+    }
+
+    // Update all bindings.
+    const value = this[propertyName];
+    const bindings = this.#propertyToBindingsMap.get(propertyName) || [];
+    for (const binding of bindings) {
+      if (binding instanceof Element) {
+        binding.textContent = value;
+      } else {
+        const { element, attrName } = binding;
+        this.#updateAttribute(element, attrName, value);
+        element[attrName] = value;
       }
     }
   }
