@@ -62,9 +62,9 @@ For an example of this kind of web component, see `demo/hello-zit-reactive.js`.
 Zit supports two-way data binding for HTML form elements.
 
 - `input` and `select` elements can have a `value` attribute
-  whose value is "@" followed by a property name.
+  whose value is "this.somePropertyName".
 - `textarea` elements can have text content
-  that is "@" followed by a property name.
+  that is "this.somePropertyName"
 
 In all these cases, if the user changes the value of the form element,
 the specified property is updated.

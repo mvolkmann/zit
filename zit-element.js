@@ -1,3 +1,5 @@
+const SKIP = "this.".length;
+
 class ZitElement extends HTMLElement {
   static #FIRST_CHAR = "a-zA-Z_$";
   static #OTHER_CHAR = this.#FIRST_CHAR + "0-9";
@@ -132,10 +134,10 @@ class ZitElement extends HTMLElement {
       if (
         (localName === "input" || localName === "select") &&
         attrName === "value" &&
-        text.startsWith("@")
+        ZitElement.#REFERENCE_RE.test(text)
       ) {
         // Configure data binding.
-        const propertyName = text.substring(1);
+        const propertyName = text.substring(SKIP);
         const propertyValue = this[propertyName];
         element.setAttribute(attrName, propertyValue);
         element[attrName] = propertyValue;
@@ -160,9 +162,9 @@ class ZitElement extends HTMLElement {
     if (localName === "style") return;
 
     const text = element.textContent.trim();
-    if (localName === "textarea" && text.startsWith("@")) {
+    if (localName === "textarea" && ZitElement.#REFERENCE_RE.test(text)) {
       // Configure data binding.
-      const propertyName = text.substring(1);
+      const propertyName = text.substring(SKIP);
       element.textContent = this[propertyName];
       this.#bind(element, propertyName);
     } else {
@@ -232,6 +234,7 @@ class ZitElement extends HTMLElement {
     const value = this[propertyName];
     const bindings = this.#propertyToBindingsMap.get(propertyName) || [];
     for (const binding of bindings) {
+      console.log("zit-element.js #react: binding =", binding);
       if (binding instanceof Element) {
         binding.textContent = value;
       } else {
@@ -259,9 +262,8 @@ class ZitElement extends HTMLElement {
     // the mapping will be the same for every instance of the web component.
     const processed = this.constructor.processed;
     if (!processed) {
-      const skip = "this.".length;
       matches.forEach((capture) => {
-        const propertyName = capture.substring(skip);
+        const propertyName = capture.substring(SKIP);
         let expressions =
           ZitElement.#propertyToExpressionsMap.get(propertyName);
         if (!expressions) {

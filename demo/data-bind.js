@@ -28,12 +28,12 @@ class DataBind extends ZitElement {
       <div>
         <div>
           <label>Name:</label>
-          <input value="@name">
+          <input value="this.name">
           <p>Hello, <span>this.name</span>!</p>
         </div>
         <div>
           <label>Color:</label>
-          <select value="@color">
+          <select value="this.color">
             <option value="red">Red</option>
             <option value="green">Green</option>
             <option value="blue">Blue</option>
@@ -42,7 +42,7 @@ class DataBind extends ZitElement {
         </div>
         <div>
           <label>Story:</label>
-          <textarea>@story</textarea>
+          <textarea>this.story</textarea>
           <p>Your story is <span>this.story</span>.</p>
       </div>
     `;
