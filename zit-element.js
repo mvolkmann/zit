@@ -1,11 +1,10 @@
 const SKIP = "this.".length;
+const FIRST_CHAR = "a-zA-Z_$";
+const OTHER_CHAR = FIRST_CHAR + "0-9";
+const IDENTIFIER = `[${FIRST_CHAR}][${OTHER_CHAR}]*`;
+const REFERENCE_RE = new RegExp("this." + IDENTIFIER, "g");
 
 class ZitElement extends HTMLElement {
-  static #FIRST_CHAR = "a-zA-Z_$";
-  static #OTHER_CHAR = this.#FIRST_CHAR + "0-9";
-  static #IDENTIFIER = `[${this.#FIRST_CHAR}][${this.#OTHER_CHAR}]*`;
-  static #REFERENCE_RE = new RegExp("this." + this.#IDENTIFIER, "g");
-
   static #propertyToExpressionsMap = new Map();
   static #template = document.createElement("template");
 
@@ -134,7 +133,7 @@ class ZitElement extends HTMLElement {
       if (
         (localName === "input" || localName === "select") &&
         attrName === "value" &&
-        ZitElement.#REFERENCE_RE.test(text)
+        REFERENCE_RE.test(text)
       ) {
         // Configure data binding.
         const propertyName = text.substring(SKIP);
@@ -162,7 +161,7 @@ class ZitElement extends HTMLElement {
     if (localName === "style") return;
 
     const text = element.textContent.trim();
-    if (localName === "textarea" && ZitElement.#REFERENCE_RE.test(text)) {
+    if (localName === "textarea" && REFERENCE_RE.test(text)) {
       // Configure data binding.
       const propertyName = text.substring(SKIP);
       element.textContent = this[propertyName];
@@ -255,7 +254,7 @@ class ZitElement extends HTMLElement {
   // Do not place untrusted expressions in
   // attribute values or the text content of elements!
   #registerPlaceholders(text, element, attrName) {
-    const matches = text.match(ZitElement.#REFERENCE_RE);
+    const matches = text.match(REFERENCE_RE);
     if (!matches) return;
 
     // Only map properties to expressions once for each web component because
