@@ -62,6 +62,8 @@ class RadioGroup extends ZitElement {
     const { value } = event.target;
     this.value = value;
     this.#internals.setFormValue(value);
+
+    // This allows users of the this web component to listen for changes.
     this.dispatchEvent(new Event("change"));
   }
 
