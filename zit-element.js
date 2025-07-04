@@ -163,14 +163,8 @@ class ZitElement extends HTMLElement {
 
       this.#evaluateAttributes(element);
     }
-
-    /*
-    console.log(
-      "#propertyToExpressionsMap =",
-      ZitElement.#propertyToExpressionsMap
-    );
-    console.log("#expressionReferencesMap =", this.#expressionReferencesMap);
-    */
+    //console.log("#propertyToExpressionsMap =", ZitElement.#propertyToExpressionsMap);
+    //console.log("#expressionReferencesMap =", this.#expressionReferencesMap);
   }
 
   #react(propertyName) {
