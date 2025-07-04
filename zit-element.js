@@ -1,16 +1,12 @@
-const SKIP = "this.".length;
 const FIRST_CHAR = "a-zA-Z_$";
 const OTHER_CHAR = FIRST_CHAR + "0-9";
 const IDENTIFIER = `[${FIRST_CHAR}][${OTHER_CHAR}]*`;
 const REFERENCE_RE = new RegExp("this." + IDENTIFIER, "g");
+const SKIP = "this.".length;
 
 class ZitElement extends HTMLElement {
   static #propertyToExpressionsMap = new Map();
   static #template = document.createElement("template");
-
-  static get observedAttributes() {
-    return Object.keys(this.properties || {});
-  }
 
   #expressionReferencesMap = new Map();
   #propertyToBindingsMap = new Map();
@@ -212,6 +208,10 @@ class ZitElement extends HTMLElement {
     //console.log("#expressionReferencesMap =", this.#expressionReferencesMap);
   }
 
+  static get observedAttributes() {
+    return Object.keys(this.properties || {});
+  }
+
   #react(propertyName) {
     // Update all expression references.
     const expressions =
@@ -233,7 +233,6 @@ class ZitElement extends HTMLElement {
     const value = this[propertyName];
     const bindings = this.#propertyToBindingsMap.get(propertyName) || [];
     for (const binding of bindings) {
-      console.log("zit-element.js #react: binding =", binding);
       if (binding instanceof Element) {
         binding.textContent = value;
       } else {
