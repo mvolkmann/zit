@@ -8,6 +8,7 @@
     <script src="hello-zit-reactive.js" type="module"></script>
     <script src="multiply-numbers.js" type="module"></script>
     <script src="multiply-numbers-reactive.js" type="module"></script>
+    <script src="radio-group.js" type="module"></script>
   </head>
   <body>
     <h2>Vanilla</h2>
@@ -21,5 +22,9 @@
     <hello-zit-reactive name="Mark"></hello-zit-reactive>
     <multiply-numbers n1="3" n2="4"></multiply-numbers>
     <multiply-numbers-reactive n1="3" n2="4"></multiply-numbers-reactive>
+    <div style="display: flex">
+      <label for="color">Color:</label>
+      <radio-group name="color" options="red,green,blue"></radio-group>
+    </div>
   </body>
 </html>
