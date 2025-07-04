@@ -89,6 +89,7 @@ class ZitElement extends HTMLElement {
         // If the property propertyName is configured to "reflect" and
         // there is a matching attribute on the custom element,
         // update that attribute.
+        const options = this.constructor.properties[propertyName];
         if (options.reflect && this.hasAttribute(propertyName)) {
           const oldValue = this.#getTypedAttribute(propertyName);
           if (value !== oldValue) {
@@ -107,8 +108,28 @@ class ZitElement extends HTMLElement {
 
   #evaluateAttributes(element) {
     for (const attrName of element.getAttributeNames()) {
+      if (!this.#canDataBind(element, attrName)) {
+        const text = element.getAttribute(attrName);
+        this.#registerPlaceholders(text, element, attrName);
+      }
+    }
+  }
+
+  #canDataBind(element, attrName) {
+    const { localName } = element;
+    if (localName === "input" || localName === "select") {
+      if (attrName !== "value") return false;
+
       const text = element.getAttribute(attrName);
-      this.#registerPlaceholders(text, element, attrName);
+      if (!text.startsWith("@")) return false;
+
+      const propertyName = text.substring(1);
+      const propertyValue = this[propertyName];
+      element.setAttribute(attrName, propertyValue);
+      element[attrName] = propertyValue;
+      this.#bind(element, propertyName);
+    } else {
+      return false;
     }
   }
 
@@ -120,11 +141,33 @@ class ZitElement extends HTMLElement {
   }
 
   #evaluateText(element) {
+    const { localName } = element;
+
     // Don't allow style elements to be affected by property values.
-    if (element.localName === "style") return;
+    if (localName === "style") return;
 
     const text = element.textContent.trim();
-    this.#registerPlaceholders(text, element);
+
+    if (localName === "textarea") {
+      if (!text.startsWith("@")) return false;
+
+      const propertyName = text.substring(1);
+      element.textContent = this[propertyName];
+      this.#bind(element, propertyName);
+    } else {
+      this.#registerPlaceholders(text, element);
+    }
+  }
+
+  #bind(element, propertyName) {
+    element.addEventListener("input", (event) => {
+      const { value } = event.target;
+      this[propertyName] = value;
+      const options = this.constructor.properties[propertyName];
+      if (options.reflect && this.hasAttribute(propertyName)) {
+        this.setAttribute(propertyName, value);
+      }
+    });
   }
 
   #fixBooleanAttributes(element) {
