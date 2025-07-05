@@ -47,6 +47,7 @@ class DataBind extends ZitElement {
           <p>Your story is <span>this.story</span>.</p>
         </div>
         <number-input label="Favorite Number:" value="this.score"></number-input>
+        <number-slider label="Slider:" value="this.score"></number-slider>
         <p>Your score is <span>this.score</span>.</p>
       </div>
     `;
