@@ -103,6 +103,7 @@ class ZitElement extends HTMLElement {
       set(value) {
         const oldValue = this["_" + propertyName];
         if (value === oldValue) return;
+
         this["_" + propertyName] = value;
 
         // If the property propertyName is configured to "reflect" and
@@ -121,25 +122,44 @@ class ZitElement extends HTMLElement {
         } else {
           this.buildDOM();
         }
+
+        // If this property is bound to a parent web component property,
+        // update that as well.
+        const map = this.propertyToParentPropertyMap;
+        const parentProperty = map ? map.get(propertyName) : null;
+        if (parentProperty) {
+          const parent = this.getRootNode().host;
+          //parent[propertyName] = value;
+          parent.setAttribute(parentProperty, value);
+        }
       },
     });
   }
 
   #evaluateAttributes(element) {
-    const { localName } = element;
+    const isWC = element.localName.includes("-");
+
     for (const attrName of element.getAttributeNames()) {
       const text = element.getAttribute(attrName);
-      if (
-        (localName === "input" || localName === "select") &&
-        attrName === "value" &&
-        REFERENCE_RE.test(text)
-      ) {
+      if (REFERENCE_RE.test(text)) {
         // Configure data binding.
         const propertyName = text.substring(SKIP);
         const propertyValue = this[propertyName];
         element.setAttribute(attrName, propertyValue);
         element[attrName] = propertyValue;
         this.#bind(element, propertyName, attrName);
+
+        // If the element is a web component,
+        // save a mapping from the attribute name in this web component
+        // to the property name in the parent web component.
+        if (isWC) {
+          let map = element.propertyToParentPropertyMap;
+          if (!map) {
+            map = new Map();
+            element.propertyToParentPropertyMap = map;
+          }
+          map.set(attrName, propertyName);
+        }
       } else {
         this.#registerPlaceholders(text, element, attrName);
       }
