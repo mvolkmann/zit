@@ -1,6 +1,7 @@
 import ZitElement from "../zit-element.js";
 
 class NumberInput extends ZitElement {
+  static formAssociated = true;
   static properties = {
     label: { type: String, reflect: true },
     value: { type: Number, reflect: true },

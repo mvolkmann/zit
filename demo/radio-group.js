@@ -1,8 +1,10 @@
 import ZitElement from "../zit-element.js";
 
 class RadioGroup extends ZitElement {
+  // This is the only thing a ZitElement subclass
+  // must contain to contribute to form submission.
   static formAssociated = true;
-  #internals = this.attachInternals();
+
   #optionsArray = [];
 
   static properties = {
@@ -14,7 +16,6 @@ class RadioGroup extends ZitElement {
 
   buildDOM() {
     super.buildDOM();
-    this.#internals.setFormValue(this.value);
   }
 
   connectedCallback() {
@@ -61,7 +62,6 @@ class RadioGroup extends ZitElement {
   handleChange(event) {
     const { value } = event.target;
     this.value = value;
-    this.#internals.setFormValue(value);
 
     // This allows users of the this web component to listen for changes.
     this.dispatchEvent(new Event("change"));

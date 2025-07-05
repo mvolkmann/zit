@@ -2,23 +2,18 @@
   <head>
     <style></style>
 
-    <!--
     <script src="counter-vanilla.js" type="module"></script>
     <script src="counter-zit.js" type="module"></script>
-    -->
     <script src="data-bind.js" type="module"></script>
-    <!--
     <script src="hello-zit.js" type="module"></script>
     <script src="hello-zit-reactive.js" type="module"></script>
     <script src="multiply-numbers.js" type="module"></script>
     <script src="multiply-numbers-reactive.js" type="module"></script>
-    <script src="radio-group.js" type="module"></script>
-    -->
     <script src="number-input.js" type="module"></script>
     <script src="number-slider.js" type="module"></script>
+    <script src="radio-group.js" type="module"></script>
   </head>
   <body>
-    <!--
     <h2>Vanilla</h2>
     <counter-vanilla count="3"></counter-vanilla>
 
@@ -30,20 +25,20 @@
     <hello-zit-reactive name="Mark"></hello-zit-reactive>
     <multiply-numbers n1="3" n2="4"></multiply-numbers>
     <multiply-numbers-reactive n1="3" n2="4"></multiply-numbers-reactive>
+    <hr />
     <form method="GET" action="/missing">
       <div style="display: flex">
         <label for="color">Color:</label>
         <radio-group name="color" options="red,green,blue"></radio-group>
       </div>
+      <data-bind
+        name="Mark"
+        color="blue"
+        score="5"
+        story="Once upon a time..."
+      ></data-bind>
       <button>Submit</button>
       <button type="reset">Reset</button>
     </form>
-    -->
-    <data-bind
-      name="Mark"
-      color="blue"
-      score="5"
-      story="Once upon a time..."
-    ></data-bind>
   </body>
 </html>

@@ -9,6 +9,8 @@ class ZitElement extends HTMLElement {
   static #template = document.createElement("template");
 
   #expressionReferencesMap = new Map();
+  #formData;
+  #internals;
   #propertyToBindingsMap = new Map();
   #reactive = false;
 
@@ -19,11 +21,20 @@ class ZitElement extends HTMLElement {
     super();
     this.#reactive = reactive;
     this.attachShadow({ mode: "open" });
+
+    if (this.constructor.formAssociated) {
+      //console.log(this.localName, "uses formAssociated");
+      this.#internals = this.attachInternals();
+      this.#formData = new FormData();
+      this.#internals.setFormValue(this.#formData);
+    }
   }
 
   attributeChangedCallback(attrName, _, newValue) {
     // Update the corresponding property.
-    this[attrName] = this.#getTypedValue(attrName, newValue);
+    const value = this.#getTypedValue(attrName, newValue);
+    this[attrName] = value;
+    this.#setFormValue(attrName, value);
   }
 
   #bind(element, propertyName, attrName) {
@@ -127,6 +138,8 @@ class ZitElement extends HTMLElement {
           //parent[propertyName] = value;
           parent.setAttribute(parentProperty, value);
         }
+
+        this.#setFormValue(propertyName, value);
       },
     });
   }
@@ -155,9 +168,9 @@ class ZitElement extends HTMLElement {
           }
           map.set(attrName, propertyName);
         }
-      } else {
-        this.#registerPlaceholders(text, element, attrName);
       }
+
+      this.#registerPlaceholders(text, element, attrName);
     }
   }
 
@@ -300,6 +313,12 @@ class ZitElement extends HTMLElement {
       // that is preceded by a lowercase letter or digit.
       .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
       .toLowerCase();
+
+  #setFormValue(propertyName, value) {
+    if (!this.#formData) return;
+    this.#formData.set(propertyName, value);
+    this.#internals.setFormValue(this.#formData);
+  }
 
   #updateAttribute(element, attrName, value) {
     const currentValue = element.getAttribute(attrName);

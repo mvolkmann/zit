@@ -1,6 +1,7 @@
 import ZitElement from "../zit-element.js";
 
 class DataBind extends ZitElement {
+  static formAssociated = true;
   static properties = {
     color: { type: String, reflect: true },
     name: { type: String, reflect: true },

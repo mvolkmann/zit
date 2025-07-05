@@ -2,7 +2,7 @@ import ZitElement from "../zit-element.js";
 
 class HelloZit extends ZitElement {
   static properties = {
-    name: { type: String, reflect: true },
+    name: { type: String, value: "World", reflect: true },
   };
 
   css() {
