@@ -71,3 +71,11 @@ the specified property is updated.
 When the property is updated,
 the displayed value of the form element is updated.
 For examples, see `demo/data-bind.js`.
+
+Web components that extend `ZitElement` can contribute values to
+form submissions by adding the following line to their class definition.
+Zit looks for that automatically does the rest of the work.
+
+```js
+static formAssociated = true;
+```
