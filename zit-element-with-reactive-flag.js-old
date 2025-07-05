@@ -12,12 +12,14 @@ class ZitElement extends HTMLElement {
   #formData;
   #internals;
   #propertyToBindingsMap = new Map();
+  #reactive = false;
 
   //TODO: Maybe reactive should default to true.
   //TODO: Maybe the opposite should not be supported if you can find
   //TODO: a nice way to support conditional and iterative rendering.
-  constructor() {
+  constructor(nonReactive) {
     super();
+    this.#reactive = !nonReactive;
     this.attachShadow({ mode: "open" });
 
     if (this.constructor.formAssociated) {
@@ -54,11 +56,22 @@ class ZitElement extends HTMLElement {
       ? `<style>${this.css()}</style>`
       : "";
     template += this.html();
+
+    if (!this.#reactive) {
+      template = Function(`return \`${template}\`;`).call(this);
+    }
+
     ZitElement.#template.innerHTML = template;
 
     this.shadowRoot.replaceChildren(
       ZitElement.#template.content.cloneNode(true)
     );
+
+    if (!this.#reactive) {
+      for (const child of this.shadowRoot.children) {
+        this.#fixBooleanAttributes(child);
+      }
+    }
 
     this.#wireEvents();
   }
@@ -66,7 +79,7 @@ class ZitElement extends HTMLElement {
   connectedCallback() {
     this.#defineProperties();
     this.buildDOM();
-    this.#makeReactive();
+    if (this.#reactive) this.#makeReactive();
     this.constructor.processed = true;
   }
 
@@ -110,7 +123,11 @@ class ZitElement extends HTMLElement {
           }
         }
 
-        this.#react(propertyName);
+        if (this.#reactive) {
+          this.#react(propertyName);
+        } else {
+          this.buildDOM();
+        }
 
         // If this property is bound to a parent web component property,
         // update that as well.
@@ -118,6 +135,7 @@ class ZitElement extends HTMLElement {
         const parentProperty = map ? map.get(propertyName) : null;
         if (parentProperty) {
           const parent = this.getRootNode().host;
+          //parent[propertyName] = value;
           parent.setAttribute(parentProperty, value);
         }
 
