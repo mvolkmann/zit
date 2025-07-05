@@ -28,12 +28,7 @@ class ZitElement extends HTMLElement {
 
   #bind(element, propertyName, attrName) {
     element.addEventListener("input", (event) => {
-      const { value } = event.target;
-      this[propertyName] = value;
-      const options = this.constructor.properties[propertyName];
-      if (options.reflect && this.hasAttribute(propertyName)) {
-        this.setAttribute(propertyName, value);
-      }
+      this[propertyName] = event.target.value;
     });
 
     let bindings = this.#propertyToBindingsMap.get(propertyName);
@@ -252,18 +247,7 @@ class ZitElement extends HTMLElement {
       }
     }
 
-    // Update all bindings.
-    const value = this[propertyName];
-    const bindings = this.#propertyToBindingsMap.get(propertyName) || [];
-    for (const binding of bindings) {
-      if (binding instanceof Element) {
-        binding.textContent = value;
-      } else {
-        const { element, attrName } = binding;
-        this.#updateAttribute(element, attrName, value);
-        element[attrName] = value;
-      }
-    }
+    this.#updateBindings(propertyName);
   }
 
   static register() {
@@ -329,6 +313,24 @@ class ZitElement extends HTMLElement {
       }
     } else if (currentValue !== value) {
       element.setAttribute(attrName, value);
+    }
+  }
+
+  #updateBindings(propertyName) {
+    const value = this[propertyName];
+    const bindings = this.#propertyToBindingsMap.get(propertyName) || [];
+    for (const binding of bindings) {
+      if (binding instanceof Element) {
+        if (binding.localName === "textarea") {
+          binding.value = value;
+        } else {
+          binding.textContent = value;
+        }
+      } else {
+        const { element, attrName } = binding;
+        this.#updateAttribute(element, attrName, value);
+        element[attrName] = value;
+      }
     }
   }
 
