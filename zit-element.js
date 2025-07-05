@@ -12,6 +12,9 @@ class ZitElement extends HTMLElement {
   #propertyToBindingsMap = new Map();
   #reactive = false;
 
+  //TODO: Maybe reactive should default to true.
+  //TODO: Maybe the opposite should not be supported if you can find
+  //TODO: a nice way to support conditional and iterative rendering.
   constructor(reactive) {
     super();
     this.#reactive = reactive;

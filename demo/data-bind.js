@@ -4,6 +4,7 @@ class DataBind extends ZitElement {
   static properties = {
     color: { type: String, reflect: true },
     name: { type: String, reflect: true },
+    score: { type: Number, reflect: true },
     story: { type: String, reflect: true },
   };
 
@@ -44,6 +45,9 @@ class DataBind extends ZitElement {
           <label>Story:</label>
           <textarea>this.story</textarea>
           <p>Your story is <span>this.story</span>.</p>
+        </div>
+        <number-input label="Favorite Number:" value="this.score"></number-input>
+        <p>Your score is <span>this.score</span>.</p>
       </div>
     `;
   }
