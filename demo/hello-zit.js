@@ -6,12 +6,15 @@ class HelloZit extends ZitElement {
   };
 
   css() {
-    return /*css*/ `p { color: blue; }`;
+    return /*css*/ `p { color: purple; }`;
   }
 
   html() {
     return /*html*/ `
-      <p>Hello, ${this.name}. Shouting ${this.name?.toUpperCase()}!</p>
+      <p>
+        Hello, <span>this.name</span>.
+        Shouting <span>this.name.toUpperCase()</span>!
+      </p>
     `;
   }
 }

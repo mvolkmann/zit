@@ -14,6 +14,16 @@ class RadioGroup extends ZitElement {
     value: { type: String },
   };
 
+  attributeChangedCallback(attr, oldValue, newValue) {
+    super.attributeChangedCallback(attr, oldValue, newValue);
+    if (attr === "value") {
+      const inputs = this.shadowRoot.querySelectorAll("input");
+      for (const input of inputs) {
+        input.checked = input.value === newValue;
+      }
+    }
+  }
+
   connectedCallback() {
     super.connectedCallback();
 

@@ -9,10 +9,6 @@ class DataBind extends ZitElement {
     story: { type: String, reflect: true },
   };
 
-  constructor() {
-    super(true);
-  }
-
   css() {
     return /*css*/ `
       :host {

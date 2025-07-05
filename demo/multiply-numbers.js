@@ -8,7 +8,10 @@ class MultiplyNumbers extends ZitElement {
 
   html() {
     return /*html*/ `
-      <p>${this.n1} * ${this.n2} = ${this.n1 * this.n2}</p>
+      <p>
+        <span>this.n1</span> * <span>this.n2</span> =
+        <span>this.n1 * this.n2</span>
+      </p>
     `;
   }
 }

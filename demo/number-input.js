@@ -7,10 +7,6 @@ class NumberInput extends ZitElement {
     value: { type: Number, reflect: true },
   };
 
-  constructor() {
-    super(true);
-  }
-
   css() {
     return /*css*/ `
       button {

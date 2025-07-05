@@ -17,9 +17,9 @@ class ZitElement extends HTMLElement {
   //TODO: Maybe reactive should default to true.
   //TODO: Maybe the opposite should not be supported if you can find
   //TODO: a nice way to support conditional and iterative rendering.
-  constructor(reactive) {
+  constructor(nonReactive) {
     super();
-    this.#reactive = reactive;
+    this.#reactive = !nonReactive;
     this.attachShadow({ mode: "open" });
 
     if (this.constructor.formAssociated) {

@@ -5,14 +5,6 @@ class CounterZit extends ZitElement {
     count: { type: Number, reflect: true },
   };
 
-  // Omit this constructor to run in "render" mode
-  // where every property changes causes the component to re-render.
-  // Include this constructor to run in "react" mode
-  // where property changes trigger targeted text and attribute updates.
-  constructor() {
-    super(true);
-  }
-
   css() {
     return /*css*/ `
       :not(:defined) {
