@@ -50,15 +50,6 @@ class RadioGroup extends ZitElement {
     `;
   }
 
-  formResetCallback() {
-    this.value = this.default;
-    const { value } = this;
-    for (const input of this.shadowRoot.querySelectorAll("input")) {
-      input.checked = input.value === value;
-    }
-  }
-
-  //TODO: Maybe adding two-way data binding would remove the need for this method.
   handleChange(event) {
     const { value } = event.target;
     this.value = value;

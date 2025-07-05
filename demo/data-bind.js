@@ -57,6 +57,13 @@ class DataBind extends ZitElement {
       </div>
     `;
   }
+
+  formResetCallback() {
+    this.color = "red";
+    this.name = "";
+    this.score = 0;
+    this.story = "";
+  }
 }
 
 DataBind.register();
