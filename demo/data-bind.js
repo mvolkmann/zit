@@ -33,6 +33,10 @@ class DataBind extends ZitElement {
           <input value="this.name">
           <p>Hello, <span>this.name</span>!</p>
         </div>
+        <div style="display: flex">
+          <label for="color">Color:</label>
+          <radio-group name="color" options="red,green,blue" value="this.color"></radio-group>
+        </div>
         <div>
           <label>Color:</label>
           <select value="this.color">

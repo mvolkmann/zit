@@ -249,7 +249,7 @@ class ZitElement extends HTMLElement {
       ZitElement.#propertyToExpressionsMap.get(propertyName) || [];
     for (const expression of expressions) {
       const value = ZitElement.#evaluateInContext(expression, this);
-      const references = this.#expressionReferencesMap.get(expression);
+      const references = this.#expressionReferencesMap.get(expression) || [];
       for (const reference of references) {
         if (reference instanceof Element) {
           reference.textContent = value;
