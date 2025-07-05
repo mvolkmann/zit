@@ -14,10 +14,6 @@ class RadioGroup extends ZitElement {
     value: { type: String },
   };
 
-  buildDOM() {
-    super.buildDOM();
-  }
-
   connectedCallback() {
     super.connectedCallback();
 
