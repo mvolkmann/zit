@@ -179,27 +179,6 @@ class ZitElement extends HTMLElement {
     }
   }
 
-  //TODO: Is this still needed?
-  /*
-  #fixBooleanAttributes(element) {
-    const booleanAttributes = ["hidden", "disabled", "readonly", "required"];
-    for (const attrName of element.getAttributeNames()) {
-      if (booleanAttributes.includes(attrName)) {
-        const value = element.getAttribute(attrName);
-        if (value === "true") {
-          element.setAttribute(attrName, attrName);
-        } else {
-          element.removeAttribute(attrName);
-        }
-      }
-    }
-
-    for (const child of element.children) {
-      this.#fixBooleanAttributes(child);
-    }
-  }
-  */
-
   #getTypedAttribute(attrName) {
     return this.#getTypedValue(attrName, this.getAttribute(attrName));
   }
