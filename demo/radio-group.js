@@ -51,6 +51,8 @@ class RadioGroup extends ZitElement {
     `;
   }
 
+  // This method cannot be private because it is called when
+  // a change event is dispatched from a radio button.
   handleChange(event) {
     const { value } = event.target;
     this.value = value;
