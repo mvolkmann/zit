@@ -342,7 +342,6 @@ class ZitElement extends HTMLElement {
       element.value = text;
     } else if (typeof text === "string" && text.trim().startsWith("<")) {
       element.innerHTML = text;
-      //TODO: Need to wire events and register bindings for this new DOM!
       this.#wireEvents(element);
       this.#makeReactive(element);
     } else {
