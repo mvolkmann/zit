@@ -43,7 +43,7 @@ class RadioGroup extends ZitElement {
   }
 
   html() {
-    // This demonstrates a component that uses iteration to generate HTML.
+    // This web component uses iteration to determine what to render.
     return /*html*/ `
       <div class="radio-group">
         this.options.split(",").map((option) => this.makeRadio(option)).join("")
