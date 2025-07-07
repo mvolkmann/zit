@@ -1,6 +1,6 @@
 import ZitElement from "../zit-element.js";
 
-class HelloZit extends ZitElement {
+class HelloWorld extends ZitElement {
   static properties = {
     name: { type: String, value: "World", reflect: true },
   };
@@ -19,4 +19,4 @@ class HelloZit extends ZitElement {
   }
 }
 
-HelloZit.register();
+HelloWorld.register();
