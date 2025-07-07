@@ -5,8 +5,6 @@ class RadioGroup extends ZitElement {
   // must contain to contribute to form submission.
   static formAssociated = true;
 
-  #optionsArray = [];
-
   static properties = {
     default: { type: String },
     name: { type: String },
@@ -26,12 +24,8 @@ class RadioGroup extends ZitElement {
 
   connectedCallback() {
     super.connectedCallback();
-
-    this.#optionsArray = this.options.split(",").map((option) => option.trim());
-    if (!this.default) this.default = this.#optionsArray[0];
+    if (!this.default) this.default = this.options.split(",")[0];
     if (!this.value) this.value = this.default;
-
-    this.buildDOM();
   }
 
   css() {
