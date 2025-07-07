@@ -79,3 +79,10 @@ Zit looks for that automatically does the rest of the work.
 ```js
 static formAssociated = true;
 ```
+
+Zit supports conditional and iterative generation of HTML.
+See `demo/temperature-eval.js` for an example of a web component
+that conditionally decides what to render based on an attribute value.
+See `demo/radio-group.js` for an example of a web component
+that iterates over values in a comma-delimited attribute value
+to determine what to render.

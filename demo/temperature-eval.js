@@ -7,9 +7,7 @@ class TemperatureEval extends ZitElement {
 
   html() {
     return /*html*/ `
-      <p>
-        this.temperature < 32 ? "freezing" : "not freezing"
-      </p>
+      <p>this.temperature < 32 ? "freezing" : "not freezing"</p>
     `;
   }
 }
