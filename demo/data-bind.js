@@ -40,8 +40,8 @@ class DataBind extends ZitElement {
             <option value="green">Green</option>
             <option value="blue">Blue</option>
           </select>
-          <p>You selected the color <span>this.color</span>.</p>
         </div>
+        <p>You selected the color <span>this.color</span>.</p>
         <div>
           <label>Story:</label>
           <textarea>this.story</textarea>

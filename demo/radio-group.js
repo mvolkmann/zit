@@ -51,7 +51,7 @@ class RadioGroup extends ZitElement {
   html() {
     return /*html*/ `
       <div class="radio-group">
-        ${this.#optionsArray.map((option) => this.#makeRadio(option)).join("")}
+        this.options.split(",").map((option) => this.makeRadio(option)).join("")
       </div>
     `;
   }
@@ -64,7 +64,9 @@ class RadioGroup extends ZitElement {
     this.dispatchEvent(new Event("change"));
   }
 
-  #makeRadio(option) {
+  // This method cannot be private because it is
+  // called from the expression in the html method.
+  makeRadio(option) {
     return /*html*/ `
       <div>
         <input

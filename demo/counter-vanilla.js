@@ -20,9 +20,9 @@ template.innerHTML = /*html*/ `
     }
   </style>
   <div>
-    <button id="decrement-btn">-</button>
+    <button id="decrement-btn" type="button">-</button>
     <span></span>
-    <button id="increment-btn">+</button>
+    <button id="increment-btn" type="button">+</button>
   </div>
 `;
 

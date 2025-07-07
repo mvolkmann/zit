@@ -13,15 +13,11 @@ class ZitElement extends HTMLElement {
   #internals;
   #propertyToBindingsMap = new Map();
 
-  //TODO: Maybe reactive should default to true.
-  //TODO: Maybe the opposite should not be supported if you can find
-  //TODO: a nice way to support conditional and iterative rendering.
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
 
     if (this.constructor.formAssociated) {
-      //console.log(this.localName, "uses formAssociated");
       this.#internals = this.attachInternals();
       this.#formData = new FormData();
       this.#internals.setFormValue(this.#formData);
@@ -59,15 +55,18 @@ class ZitElement extends HTMLElement {
     this.shadowRoot.replaceChildren(
       ZitElement.#template.content.cloneNode(true)
     );
-
-    this.#wireEvents();
   }
 
   connectedCallback() {
     this.#defineProperties();
     this.buildDOM();
-    this.#makeReactive();
-    this.constructor.processed = true;
+
+    // Wait for the DOM to update.
+    requestAnimationFrame(() => {
+      this.#wireEvents(this.shadowRoot);
+      this.#makeReactive(this.shadowRoot);
+      this.constructor.processed = true;
+    });
   }
 
   #defineProperties() {
@@ -180,6 +179,8 @@ class ZitElement extends HTMLElement {
     }
   }
 
+  //TODO: Is this still needed?
+  /*
   #fixBooleanAttributes(element) {
     const booleanAttributes = ["hidden", "disabled", "readonly", "required"];
     for (const attrName of element.getAttributeNames()) {
@@ -197,6 +198,7 @@ class ZitElement extends HTMLElement {
       this.#fixBooleanAttributes(child);
     }
   }
+  */
 
   #getTypedAttribute(attrName) {
     return this.#getTypedValue(attrName, this.getAttribute(attrName));
@@ -209,13 +211,13 @@ class ZitElement extends HTMLElement {
     return stringValue;
   }
 
-  #makeReactive() {
-    const elements = this.shadowRoot.querySelectorAll("*");
+  #makeReactive(root) {
+    const elements = root.querySelectorAll("*");
     for (const element of elements) {
+      this.#evaluateAttributes(element);
+
       // If the element has no child elements, evaluate its text content.
       if (!element.firstElementChild) this.#evaluateText(element);
-
-      this.#evaluateAttributes(element);
     }
     //console.log("#propertyToExpressionsMap =", ZitElement.#propertyToExpressionsMap);
     //console.log("#expressionReferencesMap =", this.#expressionReferencesMap);
@@ -234,7 +236,7 @@ class ZitElement extends HTMLElement {
       const references = this.#expressionReferencesMap.get(expression) || [];
       for (const reference of references) {
         if (reference instanceof Element) {
-          reference.textContent = value;
+          this.#updateElementContent(reference, value);
         } else {
           const { element, attrName } = reference;
           this.#updateAttribute(element, attrName, value);
@@ -260,8 +262,7 @@ class ZitElement extends HTMLElement {
 
     // Only map properties to expressions once for each web component because
     // the mapping will be the same for every instance of the web component.
-    const processed = this.constructor.processed;
-    if (!processed) {
+    if (!this.constructor.processed) {
       matches.forEach((capture) => {
         const propertyName = capture.substring(SKIP);
         let expressions =
@@ -285,7 +286,7 @@ class ZitElement extends HTMLElement {
     if (attrName) {
       this.#updateAttribute(element, attrName, value);
     } else {
-      element.textContent = value;
+      this.#updateElementContent(element, value);
     }
   }
 
@@ -335,8 +336,22 @@ class ZitElement extends HTMLElement {
     }
   }
 
-  #wireEvents() {
-    const elements = this.shadowRoot.querySelectorAll("*");
+  #updateElementContent(element, text) {
+    const { localName } = element;
+    if (localName === "textarea") {
+      element.value = text;
+    } else if (typeof text === "string" && text.trim().startsWith("<")) {
+      element.innerHTML = text;
+      //TODO: Need to wire events and register bindings for this new DOM!
+      this.#wireEvents(element);
+      this.#makeReactive(element);
+    } else {
+      element.textContent = text;
+    }
+  }
+
+  #wireEvents(root) {
+    const elements = root.querySelectorAll("*");
     for (const element of elements) {
       for (const attr of element.attributes) {
         const { name } = attr;

@@ -34,9 +34,9 @@ class NumberInput extends ZitElement {
     return /*html*/ `
       <div>
         <label>this.label</label>
-        <button onclick="decrement">-</button>
+        <button onclick="decrement" type="button">-</button>
         <input type="number" value="this.value" />
-        <button onclick="increment">+</button>
+        <button onclick="increment" type="button">+</button>
      </div>
     `;
   }
