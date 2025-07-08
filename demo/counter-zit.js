@@ -33,7 +33,7 @@ class CounterZit extends ZitElement {
       <button onClick="decrement" type="button"
         disabled="this.count === 0">-</button>
       <span>this.count</span>
-      <button onClick="increment" type="button">+</button>
+      <button onClick="this.count++" type="button">+</button>
       <span>(this.count < 10 ? "single" : "double") + " digit"</span>
     </div>
     `;
@@ -41,10 +41,6 @@ class CounterZit extends ZitElement {
 
   decrement() {
     if (this.count > 0) this.count--;
-  }
-
-  increment() {
-    this.count++;
   }
 }
 

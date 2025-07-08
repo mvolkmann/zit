@@ -335,10 +335,13 @@ class ZitElement extends HTMLElement {
         const { name } = attr;
         if (name.startsWith("on")) {
           const eventName = name.slice(2).toLowerCase();
-          const methodName = attr.value;
-          element.addEventListener(eventName, (event) =>
-            this[methodName](event)
-          );
+          const { value } = attr;
+          const fn =
+            typeof this[value] === "function"
+              ? (event) => this[value](event)
+              : // oxlint-disable-next-line no-eval
+                () => eval(value);
+          element.addEventListener(eventName, fn);
           element.removeAttribute(name);
         }
       }
