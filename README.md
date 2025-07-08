@@ -26,11 +26,15 @@ to see how much using Zit simplifies the code.
 To wire event listeners,
 Zit looks for attributes whose name begins with "on".
 It assumes the remainder of the attribute name is an event name.
-It also assumes that the value of the attribute is a method name
-that should be called when that event is dispatched.
+It also assumes that the value of the attribute is either
+a method name that should be called or code that should be executed
+when that event is dispatched.
 For example, the attribute `onclick="increment"` causes Zit to
 add an event listener to the element containing the attribute
 for "click" events and calls `this.increment(event)`.
+Alternatively, the attribute `onclick="this.count++"`
+adds an event listener that increments `this.count`
+when the element is clicked.
 
 The case of the event name within the attribute name
 does not matter because Zit lowercases the name.
